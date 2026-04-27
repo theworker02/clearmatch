@@ -69,7 +69,3 @@ The README includes updated UI previews from:
 - `docs/screenshots/discover.png`
 - `docs/screenshots/match-details.png`
 - `docs/screenshots/personality-test.png`
-
-## Suggested GitHub Release Summary
-
-ClearMatch v2.0.0 turns the project into a polished, portfolio-grade dating product. This release combines a premium React frontend, a typed Express/WebSocket backend, a Prisma MongoDB data model, adaptive matching, a 35-question personality assessment, safety tooling, and a Python FastAPI conversation-health service into one locally demoable full-stack application.
