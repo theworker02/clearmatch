@@ -1,0 +1,251 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  email       String   @unique
+  passwordHash String
+  emailVerified Boolean @default(false)
+  readReceipts Boolean @default(true)
+  screenshotWarning Boolean @default(true)
+  hidden      Boolean  @default(false)
+  paused      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  profile     Profile?
+}
+
+model Profile {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @unique @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  displayName String
+  birthDate   DateTime
+  age         Int
+  city        String
+  latitude    Float
+  longitude   Float
+  bio         String
+  interests   String[]
+  relationshipGoals String[]
+  datingIntent String
+  lifestyle   String[]
+  values      String[]
+  communicationStyle String
+  likelyResponseTime String
+  distancePreferenceKm Int
+  dealbreakers String[]
+  prompts     Json
+  hidden      Boolean  @default(false)
+  paused      Boolean  @default(false)
+  photoVerified Boolean @default(false)
+  photos      ProfilePhoto[]
+  preference  MatchPreference?
+  answers     PersonalityAnswer[]
+}
+
+model ProfilePhoto {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId String  @db.ObjectId
+  profile   Profile @relation(fields: [profileId], references: [id])
+  url       String
+  mimeType  String
+  sizeBytes Int
+  createdAt DateTime @default(now())
+}
+
+model Interest {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String   @unique
+  category  String
+}
+
+model MatchPreference {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId String  @unique @db.ObjectId
+  profile   Profile @relation(fields: [profileId], references: [id])
+  minAge    Int
+  maxAge    Int
+  maxDistanceKm Int
+  goals     String[]
+}
+
+model PersonalityAnswer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  profileId String  @db.ObjectId
+  profile   Profile @relation(fields: [profileId], references: [id])
+  key       String
+  label     String
+  value     Int
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fromUserId String  @db.ObjectId
+  toUserId   String  @db.ObjectId
+  type      String
+  createdAt DateTime @default(now())
+}
+
+model Match {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userIds   String[] @db.ObjectId
+  blocked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  messages  Message[]
+}
+
+model Message {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  matchId   String   @db.ObjectId
+  match     Match    @relation(fields: [matchId], references: [id])
+  fromUserId String  @db.ObjectId
+  body      String
+  replyToMessageId String? @db.ObjectId
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+}
+
+model PromptQuestion {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  category  String
+  type      String
+  question  String
+  options   String[]
+  minLabel  String?
+  maxLabel  String?
+}
+
+model PromptAnswer {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  questionId String
+  value     Json
+  createdAt DateTime @default(now())
+}
+
+model Compliment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  fromUserId String @db.ObjectId
+  toUserId String @db.ObjectId
+  category  String
+  body      String
+  status    String @default("sent")
+  createdAt DateTime @default(now())
+}
+
+model MessageReaction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  messageId String @db.ObjectId
+  userId    String @db.ObjectId
+  emoji     String
+  createdAt DateTime @default(now())
+}
+
+model UserSettings {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  account   Json
+  profile   Json
+  discovery Json
+  privacy   Json
+  notifications Json
+  safety    Json
+  appearance Json
+}
+
+model DiscoveryPreferences {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  ageRange  Int[]
+  distanceKm Int
+  intent    String
+  showMe    String
+  dealbreakers String[]
+}
+
+model MatchQualityBreakdown {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  matchId   String   @unique @db.ObjectId
+  compatibilityScore Int
+  confidenceScore Int
+  sharedInterests String[]
+  sharedValues String[]
+  relationshipGoalAlignment String
+  communicationCompatibility String
+  lifestyleRhythm String
+  possibleFrictionPoints String[]
+}
+
+model SeeMore {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  profileId String   @db.ObjectId
+  createdAt DateTime @default(now())
+}
+
+model UserBehavior {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  profileId String   @db.ObjectId
+  type      String
+  durationMs Int?
+  createdAt DateTime @default(now())
+}
+
+model MatchInteraction {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  matchId   String   @db.ObjectId
+  userId    String   @db.ObjectId
+  type      String
+  createdAt DateTime @default(now())
+}
+
+model ConversationMetrics {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  matchId   String   @unique @db.ObjectId
+  messageCount Int
+  averageMessageLength Int
+  balanceScore Float
+  averageResponseMinutes Int
+  replyRate Float
+  ghostingRisk Float
+  status    String
+  nudge     String
+  updatedAt DateTime @updatedAt
+}
+
+model TrustScore {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @unique @db.ObjectId
+  emailVerified Boolean
+  photoVerified Boolean
+  profileCompleteness Int
+  lowEffort Boolean
+  score     Int
+  badges    String[]
+  reasons   String[]
+  updatedAt DateTime @updatedAt
+}
+
+model Block {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  blockerUserId String @db.ObjectId
+  blockedUserId String @db.ObjectId
+  createdAt DateTime @default(now())
+}
+
+model Report {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  reporterUserId String @db.ObjectId
+  reportedUserId String @db.ObjectId
+  reason    String
+  details   String
+  status    String   @default("open")
+  createdAt DateTime @default(now())
+}

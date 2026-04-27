@@ -1,0 +1,33 @@
+# Dependencies and build output
+node_modules
+*/node_modules
+dist
+*/dist
+build
+coverage
+.vite
+
+# Local env and runtime files
+.env
+.env.local
+uploads/*
+target/*
+*.log
+
+# Python caches
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.venv
+venv
+
+# Editor and OS files
+.git
+.gitignore
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+

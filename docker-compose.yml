@@ -1,0 +1,41 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      PORT: 4100
+      CLIENT_ORIGIN: http://localhost:5173
+      PYTHON_FADE_SERVICE_URL: http://python-service:8000
+      FADE_SCORE_CACHE_MS: 45000
+      UPLOAD_DIR: uploads
+      JWT_SECRET: clearmatch-docker-local-secret
+    ports:
+      - "4100:4100"
+    volumes:
+      - clearmatch_uploads:/app/uploads
+    depends_on:
+      - python-service
+    restart: unless-stopped
+
+  python-service:
+    build:
+      context: .
+      dockerfile: python-service/Dockerfile
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  clearmatch_uploads:
+
